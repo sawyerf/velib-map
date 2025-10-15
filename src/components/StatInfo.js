@@ -1,10 +1,10 @@
-import "./StatInfo.css";
+import "../styles/StatInfo.css";
 
-const StatInfo = ({ name, value }) => {
+const StatInfo = ({ name, value, unit }) => {
   return (
     <div className="stat-info">
       <h2>{name}</h2>
-      <p>{value}</p>
+      <p>{value} {unit}</p>
     </div>
   );
 }
