@@ -1,0 +1,18 @@
+.stat-info {
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+}
+
+.stat-info h2 {
+  margin: 0;
+  margin-bottom: 5px;
+  font-size: 1.4em;
+}
+
+.stat-info p {
+  margin: 0;
+  font-size: 1.2em;
+}

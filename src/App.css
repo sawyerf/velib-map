@@ -1,0 +1,5 @@
+@import "leaflet/dist/leaflet.css";
+
+input[type="file"] {
+  margin: 20px 0;
+}
