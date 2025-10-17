@@ -6,6 +6,11 @@ import { processPoints, getStat } from "./libs/stats";
 
 import "./styles/App.css";
 
+const filterOpe = (operations, typeVelib) => {
+  if (typeVelib === "ELECTRIC") return operations.filter(op => op.parameter1 === 'yes')
+  else if (typeVelib === "MECHANICAL") return operations.filter(op => op.parameter1 === 'no')
+  return operations;
+}
 
 function App() {
   const [points, setPoints] = React.useState([]);
@@ -13,14 +18,8 @@ function App() {
   const [stats, setStats] = React.useState({});
   const [typeVelib, setTypeVelib] = React.useState("ALL");
 
-  const filterOpe = (operations) => {
-    if (typeVelib === "ELECTRIC") return operations.filter(op => op.parameter1 === 'yes')
-    else if (typeVelib === "MECHANICAL") return operations.filter(op => op.parameter1 === 'no')
-    return operations;
-  }
-
   React.useEffect(() => {
-    const walletOpsFiltered = filterOpe(walletOperations.current);
+    const walletOpsFiltered = filterOpe(walletOperations.current, typeVelib);
     setPoints(processPoints(walletOpsFiltered));
     setStats(getStat(walletOpsFiltered));
   }, [typeVelib]);
@@ -32,7 +31,7 @@ function App() {
       try {
         const json = JSON.parse(e.target.result);
         walletOperations.current = json.walletOperations.filter(op => op.parameter3.DISTANCE !== '0.0');
-        const walletOpsFiltered = filterOpe(walletOperations.current);
+        const walletOpsFiltered = filterOpe(walletOperations.current, typeVelib);
         setPoints(processPoints(walletOpsFiltered));
         setStats(getStat(walletOpsFiltered));
       } catch (error) {
