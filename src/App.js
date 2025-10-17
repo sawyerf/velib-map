@@ -11,7 +11,7 @@ function App() {
   const [points, setPoints] = React.useState([]);
   const walletOperations = React.useRef([]);
   const [stats, setStats] = React.useState({});
-  const [typeVelib, setTypeVelib] = React.useState("ELECTRIC");
+  const [typeVelib, setTypeVelib] = React.useState("ALL");
 
   const filterOpe = (operations) => {
     if (typeVelib === "ELECTRIC") return operations.filter(op => op.parameter1 === 'yes')

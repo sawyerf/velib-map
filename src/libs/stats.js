@@ -1,7 +1,7 @@
-import stationInfo from "../station_information.json";
+import stationsData from "../stations.json";
 
 // const stations = stationInfo.data.stations;
-const stationsById = stationInfo.data.stations.reduce((acc, station) => {
+const stationsById = stationsData.reduce((acc, station) => {
   acc[station.station_id.toString()] = station;
   return acc;
 }, {});
