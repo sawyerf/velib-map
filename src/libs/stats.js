@@ -26,8 +26,8 @@ export const parseDuration = (str) => {
   }
 }
 
-export const processPoints = (data) => {
-  if (!data?.walletOperations?.length) return [];
+export const processPoints = (walletOperations) => {
+  if (!walletOperations?.length) return [];
 
   const hitStations = {}
 
@@ -36,7 +36,7 @@ export const processPoints = (data) => {
     else hitStations[id] += 1;
   }
 
-  for (const operation of data.walletOperations) {
+  for (const operation of walletOperations) {
     addHit(operation.parameter3.departureStationId);
     addHit(operation.parameter3.arrivalStationId);
   }
@@ -54,8 +54,8 @@ export const processPoints = (data) => {
   }).filter(Boolean);
 }
 
-export const processPoints2 = (data) => {
-  if (!data?.walletOperations?.length) return [];
+export const processPoints2 = (walletOperations) => {
+  if (!walletOperations?.length) return [];
 
   const hitStations = []
 
@@ -65,7 +65,7 @@ export const processPoints2 = (data) => {
     hitStations.push([station.lat, station.lon, 1]);
   }
 
-  for (const operation of data.walletOperations) {
+  for (const operation of walletOperations) {
     addHit(operation.parameter3.departureStationId);
     addHit(operation.parameter3.arrivalStationId);
   }
@@ -73,17 +73,17 @@ export const processPoints2 = (data) => {
   return hitStations;
 }
 
-export const getStat = (data) => {
-  if (!data?.walletOperations?.length) return {};
+export const getStat = (walletOperations) => {
+  if (!walletOperations?.length) return {};
 
   return {
-    totalRides: data.walletOperations.length,
-    maxDistance: Math.max(...data.walletOperations.map(op => parseInt(op.parameter3.DISTANCE, 10))) / 1000,
-    maxSpeed: Math.max(...data.walletOperations.map(op => op.parameter3.AVERAGE_SPEED)),
-    totalDistance: data.walletOperations.reduce((acc, op) => acc + parseInt(op.parameter3.DISTANCE, 10), 0) / 1000,
-    totalDuration: data.walletOperations.reduce((acc, op) => acc + parseDuration(op.quantityStr), 0) / 60,
-    avgDuration: data.walletOperations.reduce((acc, op) => acc + parseDuration(op.quantityStr), 0) / data.walletOperations.length / 60,
-    avgDistance: data.walletOperations.reduce((acc, op) => acc + parseInt(op.parameter3.DISTANCE, 10), 0) / data.walletOperations.length / 1000,
-    avgSpeed: (data.walletOperations.reduce((acc, op) => acc + op.parameter3.AVERAGE_SPEED, 0) / data.walletOperations.length).toFixed(2),
+    totalRides: walletOperations.length,
+    maxDistance: Math.max(...walletOperations.map(op => parseInt(op.parameter3.DISTANCE, 10))) / 1000,
+    maxSpeed: Math.max(...walletOperations.map(op => op.parameter3.AVERAGE_SPEED)),
+    totalDistance: walletOperations.reduce((acc, op) => acc + parseInt(op.parameter3.DISTANCE, 10), 0) / 1000,
+    totalDuration: walletOperations.reduce((acc, op) => acc + parseDuration(op.quantityStr), 0) / 60,
+    avgDuration: walletOperations.reduce((acc, op) => acc + parseDuration(op.quantityStr), 0) / walletOperations.length / 60,
+    avgDistance: walletOperations.reduce((acc, op) => acc + parseInt(op.parameter3.DISTANCE, 10), 0) / walletOperations.length / 1000,
+    avgSpeed: (walletOperations.reduce((acc, op) => acc + op.parameter3.AVERAGE_SPEED, 0) / walletOperations.length).toFixed(2),
   }
 }

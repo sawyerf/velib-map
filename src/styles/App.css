@@ -33,3 +33,60 @@ a {
 a:hover {
   background-color: #e0e0e0;
 }
+
+.buttons {
+  margin-bottom: 20px;
+  gap: 10px;
+  display: flex;
+
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+}
+
+#mechanical {
+  color: green;
+  background-color: #f0fff4;
+}
+
+#electric {
+  color: #2484fd;
+  background-color: #f4f7ff;
+}
+
+#all {
+  color: #555555;
+  background-color: #f9f9f9;
+}
+
+#electric:hover {
+  background-color: #d9e4f8;
+}
+
+#mechanical:hover {
+  background-color: #dff3e3;
+}
+
+#all:hover {
+  background-color: #e6e6e6;
+}
+
+#electric:disabled {
+  background-color: #2484fd;
+  color: white;
+}
+
+#mechanical:disabled {
+  background-color: green;
+  color: white;
+}
+
+#all:disabled {
+  background-color: gray;
+  color: white;
+}

@@ -9,7 +9,21 @@ import "./styles/App.css";
 
 function App() {
   const [points, setPoints] = React.useState([]);
+  const walletOperations = React.useRef([]);
   const [stats, setStats] = React.useState({});
+  const [typeVelib, setTypeVelib] = React.useState("ELECTRIC");
+
+  const filterOpe = (operations) => {
+    if (typeVelib === "ELECTRIC") return operations.filter(op => op.parameter1 === 'yes')
+    else if (typeVelib === "MECHANICAL") return operations.filter(op => op.parameter1 === 'no')
+    return operations;
+  }
+
+  React.useEffect(() => {
+    const walletOpsFiltered = filterOpe(walletOperations.current);
+    setPoints(processPoints(walletOpsFiltered));
+    setStats(getStat(walletOpsFiltered));
+  }, [typeVelib]);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -17,8 +31,10 @@ function App() {
     reader.onload = (e) => {
       try {
         const json = JSON.parse(e.target.result);
-        setPoints(processPoints(json))
-        setStats(getStat(json))
+        walletOperations.current = json.walletOperations.filter(op => op.parameter3.DISTANCE !== '0.0');
+        const walletOpsFiltered = filterOpe(walletOperations.current);
+        setPoints(processPoints(walletOpsFiltered));
+        setStats(getStat(walletOpsFiltered));
       } catch (error) {
         console.error("Invalid JSON file", error);
       }
@@ -32,6 +48,11 @@ function App() {
       <div>
         <a href="https://www.velib-metropole.fr/api/private/getCourseList?limit=10000" target="_blank" rel="noreferrer">Download your ride history (JSON)</a>
         <input type="file" accept=".json" onChange={handleFileChange} />
+      </div>
+      <div class="buttons">
+        <button id="all" onClick={() => setTypeVelib("ALL")} disabled={typeVelib === "ALL"}>Tout</button>
+        <button id="mechanical" onClick={() => setTypeVelib("MECHANICAL")} disabled={typeVelib === "MECHANICAL"}>Mécanique</button>
+        <button id="electric" onClick={() => setTypeVelib("ELECTRIC")} disabled={typeVelib === "ELECTRIC"}>Électrique</button>
       </div>
       <Map points={points} />
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px", marginTop: "20px" }}>
