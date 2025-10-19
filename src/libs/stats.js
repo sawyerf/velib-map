@@ -5,7 +5,6 @@ const stationsById = stationsData.reduce((acc, station) => {
   acc[station.station_id.toString()] = station;
   return acc;
 }, {});
-console.log(stationsById);
 
 // "10min" -> 10 * 60
 export const parseDuration = (str) => {
@@ -13,7 +12,6 @@ export const parseDuration = (str) => {
   if (!match) return 0;
   const value = parseInt(match[1], 10);
   const unit = match[2];
-  console.log({value, unit});
   switch (unit) {
     case 'min':
       return value * 60;
@@ -86,4 +84,22 @@ export const getStat = (walletOperations) => {
     avgDistance: walletOperations.reduce((acc, op) => acc + parseInt(op.parameter3.DISTANCE, 10), 0) / walletOperations.length / 1000,
     avgSpeed: (walletOperations.reduce((acc, op) => acc + op.parameter3.AVERAGE_SPEED, 0) / walletOperations.length).toFixed(2),
   }
+}
+
+export const getStatsByDay = (walletOperations) => {
+  if (!walletOperations?.length) return {};
+  const statsByDay = {};
+  for (const op of walletOperations) {
+    const date = new Date(op.startDate);
+    const dayKey = date.toISOString().split('T')[0];
+    if (!statsByDay[dayKey]) statsByDay[dayKey] = 0;
+    statsByDay[dayKey] += 1;
+  }
+  return statsByDay;
+}
+
+export const filterOpe = (operations, typeVelib) => {
+  if (typeVelib === "ELECTRIC") return operations.filter(op => op.parameter1 === 'yes')
+  else if (typeVelib === "MECHANICAL") return operations.filter(op => op.parameter1 === 'no')
+  return operations;
 }

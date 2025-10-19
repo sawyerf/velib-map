@@ -2,26 +2,23 @@
 import React from "react";
 import Map from "./components/map";
 import StatInfo from "./components/StatInfo";
-import { processPoints, getStat } from "./libs/stats";
+import Heatmap from "./components/Heatmap";
+import { processPoints, getStat, filterOpe, getStatsByDay } from "./libs/stats";
 
 import "./styles/App.css";
-
-const filterOpe = (operations, typeVelib) => {
-  if (typeVelib === "ELECTRIC") return operations.filter(op => op.parameter1 === 'yes')
-  else if (typeVelib === "MECHANICAL") return operations.filter(op => op.parameter1 === 'no')
-  return operations;
-}
 
 function App() {
   const [points, setPoints] = React.useState([]);
   const walletOperations = React.useRef([]);
   const [stats, setStats] = React.useState({});
+  const [statsByDay, setStatsByDay] = React.useState({});
   const [typeVelib, setTypeVelib] = React.useState("ALL");
 
   React.useEffect(() => {
     const walletOpsFiltered = filterOpe(walletOperations.current, typeVelib);
     setPoints(processPoints(walletOpsFiltered));
     setStats(getStat(walletOpsFiltered));
+    setStatsByDay(getStatsByDay(walletOpsFiltered));
   }, [typeVelib]);
 
   const handleFileChange = (event) => {
@@ -34,6 +31,7 @@ function App() {
         const walletOpsFiltered = filterOpe(walletOperations.current, typeVelib);
         setPoints(processPoints(walletOpsFiltered));
         setStats(getStat(walletOpsFiltered));
+        setStatsByDay(getStatsByDay(walletOpsFiltered));
       } catch (error) {
         console.error("Invalid JSON file", error);
       }
@@ -54,16 +52,23 @@ function App() {
         <button id="electric" onClick={() => setTypeVelib("ELECTRIC")} disabled={typeVelib === "ELECTRIC"}>Électrique</button>
       </div>
       <Map points={points} />
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px", marginTop: "20px" }}>
-        <StatInfo name="Nombre total de trajets" value={stats.totalRides} unit="" />
-        <StatInfo name="Vitesse maximale" value={stats.maxSpeed?.toFixed(2)} unit="km/h" />
-        <StatInfo name="Vitesse moyenne" value={stats.avgSpeed} unit="km/h" />
-        <StatInfo name="Distance moyenne" value={stats.avgDistance?.toFixed(2)} unit="km" />
-        <StatInfo name="Distance maximale" value={stats.maxDistance?.toFixed(2)} unit="km" />
-        <StatInfo name="Distance totale" value={stats.totalDistance?.toFixed(2)} unit="km" />
-        <StatInfo name="Durée moyenne" value={stats.avgDuration?.toFixed(2)} unit="min" />
-        <StatInfo name="Durée totale" value={stats.totalDuration?.toFixed(2)} unit="min" />
-      </div>
+      {
+        points.length > 0 && (
+          <>
+            <div style={{ display: "grid", gap: "16px", marginTop: "20px", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", width: "100%", maxWidth: "800px" }}>
+              <StatInfo name="Nombre de trajets" value={stats.totalRides} unit="" />
+              <StatInfo name="Vitesse maximale" value={stats.maxSpeed?.toFixed(2)} unit="km/h" />
+              <StatInfo name="Vitesse moyenne" value={stats.avgSpeed} unit="km/h" />
+              <StatInfo name="Distance moyenne" value={stats.avgDistance?.toFixed(2)} unit="km" />
+              <StatInfo name="Distance maximale" value={stats.maxDistance?.toFixed(2)} unit="km" />
+              <StatInfo name="Distance totale" value={stats.totalDistance?.toFixed(2)} unit="km" />
+              <StatInfo name="Durée moyenne" value={stats.avgDuration?.toFixed(2)} unit="min" />
+              <StatInfo name="Durée totale" value={stats.totalDuration?.toFixed(2)} unit="min" />
+            </div>
+            <h3 className="subtitle">Nombre de trajets par jour</h3>
+            <Heatmap data={statsByDay} />
+          </>
+        )}
     </div>
   );
 }

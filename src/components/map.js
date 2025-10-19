@@ -22,7 +22,7 @@ function Map({ points }) {
     // 3️⃣ Exemple de points [lat, lon, intensité]
     // 4️⃣ Ajouter la couche heatmap
     const heat = L.heatLayer(points, {
-      radius: 25,      // Taille d’influence
+      radius: 20,      // Taille d’influence
       blur: 15,        // Lissage
       maxZoom: 17,     // Zoom max où la chaleur est visible
       gradient: {      // Couleurs
@@ -32,6 +32,19 @@ function Map({ points }) {
         0.9: "red",
       },
     });
+
+    const stations = L.layerGroup();
+    stations.addTo(map);
+    points.forEach(([lat, lon, intensity]) => {
+      L.circleMarker([lat, lon], {
+        radius: 1,
+        color: 'black',
+        fillColor: 'black',
+      }).addTo(stations);
+    });
+
+    stations.addTo(map);
+
 
     heat.addTo(map);
 

@@ -90,3 +90,9 @@ button {
   background-color: gray;
   color: white;
 }
+
+.subtitle {
+  font-size: 1.2em;
+  margin-top: 20px;
+  margin-bottom: 0px;
+}
