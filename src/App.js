@@ -64,6 +64,7 @@ function App() {
               <StatInfo name="Distance totale" value={stats.totalDistance?.toFixed(2)} unit="km" />
               <StatInfo name="Durée moyenne" value={stats.avgDuration?.toFixed(2)} unit="min" />
               <StatInfo name="Durée totale" value={stats.totalDuration?.toFixed(2)} unit="min" />
+              <StatInfo name="Stations utilisées" value={points.length} unit="" />
             </div>
             <h3 className="subtitle">Nombre de trajets par jour</h3>
             <Heatmap data={statsByDay} />
