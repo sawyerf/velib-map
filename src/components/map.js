@@ -1,13 +1,15 @@
 // App.jsx
-import { useEffect } from "react";
+import React from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet.heat";
 
 function Map({ points }) {
-  useEffect(() => {
+  const map = React.useRef(null);
+
+  React.useEffect(() => {
     // 1️⃣ Initialiser la carte centrée sur Paris
-    const map = L.map("map", {
+    map.current = L.map("map", {
       center: [48.8566, 2.3522],
       zoom: 11,
       minZoom: 10,
@@ -17,9 +19,15 @@ function Map({ points }) {
     // 2️⃣ Ajouter le fond OpenStreetMap
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: '&copy; OpenStreetMap contributors',
-    }).addTo(map);
+    }).addTo(map.current);
 
-    // 3️⃣ Exemple de points [lat, lon, intensité]
+    return () => map.current.remove();
+  }, []);
+
+  React.useEffect(() => {
+    if (!map.current) return;
+    if (points.length === 0) return;
+
     // 4️⃣ Ajouter la couche heatmap
     const heat = L.heatLayer(points, {
       radius: 20,      // Taille d’influence
@@ -34,7 +42,7 @@ function Map({ points }) {
     });
 
     const stations = L.layerGroup();
-    stations.addTo(map);
+
     points.forEach(([lat, lon, intensity]) => {
       L.circleMarker([lat, lon], {
         radius: 1,
@@ -43,13 +51,13 @@ function Map({ points }) {
       }).addTo(stations);
     });
 
-    stations.addTo(map);
+    stations.addTo(map.current);
+    heat.addTo(map.current);
 
-
-    heat.addTo(map);
-
-    // 5️⃣ Nettoyer la carte à la destruction du composant
-    return () => map.remove();
+    return () => {
+      map.current.removeLayer(heat);
+      map.current.removeLayer(stations);
+    };
   }, [points]);
 
   return (
