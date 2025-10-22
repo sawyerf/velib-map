@@ -13,3 +13,15 @@
   height: 12px;
   border-radius: 2px;
 }
+
+.day-cell:hover::after {
+  content: attr(title);
+  position: absolute;
+  background: #333;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  transform: translate(-50%, -120%);
+  z-index: 10;
+}

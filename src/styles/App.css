@@ -1,9 +1,12 @@
 @import "leaflet/dist/leaflet.css";
 
 .main-container {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding-bottom: 20px;
+  padding-top: 20px;
 }
 
 .main-container h1 {
@@ -11,8 +14,15 @@
   margin-bottom: 20px;
 }
 
-.main-container::backdrop {
-  background-color: rgba(0, 0, 0, 0.5);
+.tuto {
+  padding: 15px;
+  padding-bottom: 20px;
+  text-align: center;
+}
+
+.tuto p {
+  font-size: 1.1em;
+  margin: 5px 0;
 }
 
 input[type="file"] {
@@ -26,7 +36,6 @@ input[type="file"]::file-selector-button {
   background-color: #888;
   color: white;
   padding: 10px 20px;
-  /* border-radius: 5px; */
   cursor: pointer;
 }
 
@@ -36,6 +45,11 @@ input[type="file"]:hover::file-selector-button {
 
 a {
   text-decoration: none;
+  color: #2484fd;
+}
+
+.download {
+  text-decoration: none;
   border: 1px solid #ccc;
   padding: 10px 20px;
   border-radius: 5px;
@@ -43,7 +57,7 @@ a {
   color: #333;
 }
 
-a:hover {
+.download:hover {
   background-color: #e0e0e0;
 }
 
