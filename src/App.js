@@ -3,7 +3,9 @@ import React from "react";
 import Map from "./components/map";
 import StatInfo from "./components/StatInfo";
 import Heatmap from "./components/Heatmap";
-import { processPoints, getStat, filterOpe, getStatsByDay } from "./libs/stats";
+import Station from "./components/Station";
+import { BarChart } from '@mui/x-charts/BarChart';
+import stat from "./libs/stats";
 
 import "./styles/App.css";
 
@@ -12,26 +14,48 @@ function App() {
   const walletOperations = React.useRef([]);
   const [stats, setStats] = React.useState({});
   const [statsByDay, setStatsByDay] = React.useState({});
+  const [statsByHour, setStatsByHour] = React.useState([]);
   const [typeVelib, setTypeVelib] = React.useState("ALL");
+  const [topStations, setTopStations] = React.useState([]);
 
-  React.useEffect(() => {
-    const walletOpsFiltered = filterOpe(walletOperations.current, typeVelib);
-    setPoints(processPoints(walletOpsFiltered));
-    setStats(getStat(walletOpsFiltered));
-    setStatsByDay(getStatsByDay(walletOpsFiltered));
+  const updateStats = React.useCallback(() => {
+    const walletOpsFiltered = stat.filterOpe(walletOperations.current, typeVelib);
+    setPoints(stat.processPoints(walletOpsFiltered));
+    setStats(stat.getStat(walletOpsFiltered));
+    setStatsByDay(stat.getStatsByDay(walletOpsFiltered));
+    setStatsByHour(stat.getStatsByHour(walletOpsFiltered));
+    setTopStations(stat.getTopStations(walletOpsFiltered, 5));
   }, [typeVelib]);
 
+  React.useEffect(() => {
+    updateStats();
+  }, [updateStats]);
+
+  document.body.ondrop = (event) => {
+    handleFileChange(event);
+  };
+
+  document.body.ondragover = (event) => {
+    event.preventDefault();
+  };
+
   const handleFileChange = (event) => {
-    const file = event.target.files[0];
+    event.preventDefault();
+    let file = null;
+
+    if (event?.target?.files?.length > 0) {
+      file = event.target.files[0];
+    } else if (event?.dataTransfer?.files?.length > 0) {
+      file = event.dataTransfer.files[0];
+    } else {
+      return;
+    }
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
         const json = JSON.parse(e.target.result);
         walletOperations.current = json.walletOperations.filter(op => op.parameter3.DISTANCE !== '0.0');
-        const walletOpsFiltered = filterOpe(walletOperations.current, typeVelib);
-        setPoints(processPoints(walletOpsFiltered));
-        setStats(getStat(walletOpsFiltered));
-        setStatsByDay(getStatsByDay(walletOpsFiltered));
+        updateStats();
       } catch (error) {
         console.error("Invalid JSON file", error);
       }
@@ -40,10 +64,19 @@ function App() {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-      <h1>Velib Stats Visualizer</h1>
-      <div>
-        <a href="https://www.velib-metropole.fr/api/private/getCourseList?limit=10000" target="_blank" rel="noreferrer">Download your ride history (JSON)</a>
+    <div className="main-container">
+      <h1>Statistiques Vélib</h1>
+      <div style={{
+        display: "flex",
+        flexDirection: "wrap",
+        gap: "16px",
+        alignItems: "center",
+        justifyContent: "center",
+        marginBottom: "20px",
+        marginTop: "10px",
+      }}
+      >
+        <a href="https://www.velib-metropole.fr/api/private/getCourseList?limit=10000" target="_blank" rel="noreferrer">Télécharger vos trajets (JSON)</a>
         <input type="file" accept=".json" onChange={handleFileChange} />
       </div>
       <div class="buttons">
@@ -66,10 +99,34 @@ function App() {
               <StatInfo name="Durée totale" value={stats.totalDuration?.toFixed(2)} unit="min" />
               <StatInfo name="Stations utilisées" value={points.length} unit="" />
             </div>
+            <h3 className="subtitle">Top 5 des stations les plus utilisées</h3>
+            <div className="stations-container">
+              {topStations.map((station) => (
+                <Station key={station.id} name={station.name} hits={station.hits} />
+              ))}
+            </div>
             <h3 className="subtitle">Nombre de trajets par jour</h3>
             <Heatmap data={statsByDay} />
           </>
         )}
+      {
+        statsByHour.length > 0 && (
+          <>
+            <h3 className="subtitle">Nombre de trajets par heure de la journée</h3>
+            <BarChart
+              dataset={statsByHour}
+              xAxis={[{ dataKey: 'hour', label: 'Heure de la journée' }]}
+              series={[
+                { dataKey: 'count', label: 'Nombre de trajets', color: 'blue' },
+                // { dataKey: 'totalDistance', label: 'Distance totale (m)', color: 'green' },
+                // { dataKey: 'totalDuration', label: 'Durée totale (s)', color: 'orange' },
+              ]}
+              width={Math.min(window.innerWidth - 40, 800)}
+              height={Math.min(window.innerWidth - 40, 800) * 0.5}
+            />
+          </>
+        )
+      }
     </div>
   );
 }

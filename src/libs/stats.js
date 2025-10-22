@@ -24,20 +24,21 @@ export const parseDuration = (str) => {
   }
 }
 
+export const getHitStations = (walletOperations) => {
+  const hitStations = {};
+  for (const operation of walletOperations) {
+    const departureId = operation.parameter3.departureStationId;
+    const arrivalId = operation.parameter3.arrivalStationId;
+    hitStations[departureId] = (hitStations[departureId] || 0) + 1;
+    hitStations[arrivalId] = (hitStations[arrivalId] || 0) + 1;
+  }
+  return hitStations;
+}
+
 export const processPoints = (walletOperations) => {
   if (!walletOperations?.length) return [];
 
-  const hitStations = {}
-
-  const addHit = (id) => {
-    if (!hitStations[id]) hitStations[id] = 1;
-    else hitStations[id] += 1;
-  }
-
-  for (const operation of walletOperations) {
-    addHit(operation.parameter3.departureStationId);
-    addHit(operation.parameter3.arrivalStationId);
-  }
+  const hitStations = getHitStations(walletOperations);
 
   const maxHit = Math.max(...Object.values(hitStations));
 
@@ -47,7 +48,7 @@ export const processPoints = (walletOperations) => {
     return [
       station.lat,
       station.lon,
-      (hits / maxHit ) * 100
+      (hits / maxHit) * 100
     ];
   }).filter(Boolean);
 }
@@ -98,8 +99,52 @@ export const getStatsByDay = (walletOperations) => {
   return statsByDay;
 }
 
+export const getStatsByHour = (walletOperations) => {
+  if (!walletOperations?.length) return [];
+  const statsByHour = {};
+  for (const op of walletOperations) {
+    const date = new Date(op.startDate);
+    const hourKey = date.getHours();
+    statsByHour[hourKey] = {
+      count: (statsByHour[hourKey]?.count || 0) + 1,
+      totalDistance: (statsByHour[hourKey]?.totalDistance || 0) + parseInt(op.parameter3.DISTANCE, 10),
+      totalDuration: (statsByHour[hourKey]?.totalDuration || 0) + parseDuration(op.quantityStr),
+    }
+  }
+  return Array.from({ length: 24 }).map((_, hour) => ({
+    hour,
+    ...(statsByHour[hour] || { count: 0, totalDistance: 0, totalDuration: 0 }),
+  }));
+}
+
 export const filterOpe = (operations, typeVelib) => {
   if (typeVelib === "ELECTRIC") return operations.filter(op => op.parameter1 === 'yes')
   else if (typeVelib === "MECHANICAL") return operations.filter(op => op.parameter1 === 'no')
   return operations;
 }
+
+export const getTopStations = (walletOperations, topN = 5) => {
+  if (!walletOperations?.length) return [];
+  const hitStations = getHitStations(walletOperations);
+  const stationsArray = Object.entries(hitStations).map(([stationId, hits]) => {
+    const station = stationsById[stationId];
+    return {
+      id: stationId,
+      name: station ? station.name : "Inconnu",
+      hits,
+    };
+  });
+  stationsArray.sort((a, b) => b.hits - a.hits);
+  return stationsArray.slice(0, topN);
+}
+
+export default {
+  parseDuration,
+  processPoints,
+  getStat,
+  getStatsByDay,
+  filterOpe,
+  getTopStations,
+  getStatsByHour,
+  processPoints2,
+};

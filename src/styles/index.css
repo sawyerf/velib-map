@@ -5,14 +5,23 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  max-width: 800px;
-  margin: auto;
   font-family: Arial, sans-serif;
+
+  min-height: 100vh;
   background-color: #f0f0f0;
-  padding: 20px;
+}
+
+* {
+  margin: 0;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.app-container {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
 }
