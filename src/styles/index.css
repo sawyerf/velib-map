@@ -21,7 +21,6 @@ code {
 }
 
 .app-container {
-  display: flex;
   max-width: 800px;
   min-height: 100vh;
   margin: auto;

@@ -40,7 +40,7 @@ function App() {
   }
 
   return (
-    <div className="main-container" style={{ justifyContent: "center" }}>
+    <div className="main-container">
       <h1>Statistiques Vélib</h1>
       {
         walletOperations.length === 0 && (
