@@ -84,6 +84,9 @@ export const getStat = (walletOperations) => {
     avgDuration: walletOperations.reduce((acc, op) => acc + parseDuration(op.quantityStr), 0) / walletOperations.length / 60,
     avgDistance: walletOperations.reduce((acc, op) => acc + parseInt(op.parameter3.DISTANCE, 10), 0) / walletOperations.length / 1000,
     avgSpeed: (walletOperations.reduce((acc, op) => acc + op.parameter3.AVERAGE_SPEED, 0) / walletOperations.length).toFixed(2),
+    amount: walletOperations.reduce((acc, op) => acc + op.amountWithTax, 0),
+    avgAmount: walletOperations.reduce((acc, op) => acc + op.amountWithTax, 0) / walletOperations.length,
+    savedCo2: walletOperations.reduce((acc, op) => acc + op.parameter3.SAVED_CARBON_DIOXIDE, 0) / 1000,
   }
 }
 
@@ -117,10 +120,17 @@ export const getStatsByHour = (walletOperations) => {
   }));
 }
 
-export const filterOpe = (operations, typeVelib) => {
-  if (typeVelib === "ELECTRIC") return operations.filter(op => op.parameter1 === 'yes')
-  else if (typeVelib === "MECHANICAL") return operations.filter(op => op.parameter1 === 'no')
-  return operations;
+export const filterOpe = (operations, typeVelib, startDate, endDate) => {
+  console.log("Filtering operations:", { typeVelib, startDate, endDate });
+  let result = operations
+
+  if (typeVelib === "ELECTRIC") result = result.filter(op => op.parameter1 === 'yes')
+  else if (typeVelib === "MECHANICAL") result = result.filter(op => op.parameter1 === 'no')
+
+  if (startDate) result = result.filter(op => new Date(op.startDate) >= new Date(startDate))
+  if (endDate) result = result.filter(op => new Date(op.startDate) <= new Date(endDate))
+
+  return result;
 }
 
 export const getTopStations = (walletOperations, topN = 5) => {

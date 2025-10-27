@@ -7,7 +7,7 @@ import Heatmap from "../components/Heatmap";
 import Station from "../components/Station";
 import { BarChart } from '@mui/x-charts/BarChart';
 
-const Stats = ({ walletOperations, typeVelib }) => {
+const Stats = ({ walletOperations, typeVelib, startDate, endDate }) => {
   const [points, setPoints] = React.useState([]);
   const [stats, setStats] = React.useState(null);
   const [statsByDay, setStatsByDay] = React.useState(null);
@@ -15,19 +15,17 @@ const Stats = ({ walletOperations, typeVelib }) => {
   const [topStations, setTopStations] = React.useState([]);
 
   const updateStats = React.useCallback(() => {
-    const walletOpsFiltered = stat.filterOpe(walletOperations, typeVelib);
+    const walletOpsFiltered = stat.filterOpe(walletOperations, typeVelib, startDate, endDate);
     setPoints(stat.processPoints(walletOpsFiltered));
     setStats(stat.getStat(walletOpsFiltered));
     setStatsByDay(stat.getStatsByDay(walletOpsFiltered));
     setStatsByHour(stat.getStatsByHour(walletOpsFiltered));
     setTopStations(stat.getTopStations(walletOpsFiltered, 5));
-  }, [walletOperations, typeVelib]);
+  }, [walletOperations, typeVelib, startDate, endDate]);
 
   React.useEffect(() => {
-    console.log("Updating stats...");
-    console.log("Wallet operations:", walletOperations);
     updateStats();
-  }, [walletOperations, typeVelib]);
+  }, [walletOperations, typeVelib, startDate, endDate]);
 
   if (!walletOperations?.length) return null;
   return (
@@ -44,6 +42,9 @@ const Stats = ({ walletOperations, typeVelib }) => {
           <StatInfo name="Durée moyenne" value={stats.avgDuration?.toFixed(2)} unit="min" />
           <StatInfo name="Durée totale" value={stats.totalDuration?.toFixed(2)} unit="min" />
           <StatInfo name="Stations utilisées" value={points.length} unit="" />
+          <StatInfo name="Total dépensé" value={stats.amount?.toFixed(2)} unit="€" />
+          <StatInfo name="Dépense moyenne" value={stats.avgAmount?.toFixed(2)} unit="€" />
+          <StatInfo name="CO2 économisé" value={stats.savedCo2?.toFixed(2)} unit="kg" />
         </div>
       )}
       {topStations.length > 0 && (

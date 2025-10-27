@@ -7,6 +7,8 @@ import Stats from "./components/Stats";
 function App() {
   const [walletOperations, setWalletOperations] = React.useState([]);
   const [typeVelib, setTypeVelib] = React.useState("ALL");
+  const [startDate, setStartDate] = React.useState(null);
+  const [endDate, setEndDate] = React.useState(null);
 
   document.body.ondrop = (event) => {
     handleFileChange(event);
@@ -67,13 +69,25 @@ function App() {
       </div>
       {
         walletOperations?.length > 0 &&
-        <div className="buttons">
-          <button id="all" onClick={() => setTypeVelib("ALL")} disabled={typeVelib === "ALL"}>Tout</button>
-          <button id="mechanical" onClick={() => setTypeVelib("MECHANICAL")} disabled={typeVelib === "MECHANICAL"}>Mécanique</button>
-          <button id="electric" onClick={() => setTypeVelib("ELECTRIC")} disabled={typeVelib === "ELECTRIC"}>Électrique</button>
-        </div>
+        <>
+          <div className="buttons">
+            <button id="all" onClick={() => setTypeVelib("ALL")} disabled={typeVelib === "ALL"}>Tout</button>
+            <button id="mechanical" onClick={() => setTypeVelib("MECHANICAL")} disabled={typeVelib === "MECHANICAL"}>Mécanique</button>
+            <button id="electric" onClick={() => setTypeVelib("ELECTRIC")} disabled={typeVelib === "ELECTRIC"}>Électrique</button>
+          </div>
+          <div className="buttons">
+            <input type="date" value={startDate || ""} onChange={(e) => setStartDate(e.target.value)} />
+            →
+            <input type="date" value={endDate || ""} onChange={(e) => setEndDate(e.target.value)} />
+          </div>
+        </>
       }
-      <Stats walletOperations={walletOperations} typeVelib={typeVelib} />
+      <Stats
+        walletOperations={walletOperations}
+        typeVelib={typeVelib}
+        startDate={startDate}
+        endDate={endDate}
+      />
     </div>
   );
 }

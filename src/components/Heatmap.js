@@ -28,7 +28,7 @@ const Heatmap = ({ data }) => {
       {dates.map((day, wi) => (
         <div
           key={day.date}
-          title={`${day.date} — ${day.value} trajets`}
+          title={`${day.value} trajet(s) le ${new Date(day.date).toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`}
           className={`day-cell`}
           style={{
             backgroundColor: !day.value ? "#dcdee0ff" : `rgba(0, 128, 0, ${day.value / maxValue})`,
