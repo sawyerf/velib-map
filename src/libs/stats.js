@@ -121,14 +121,13 @@ export const getStatsByHour = (walletOperations) => {
 }
 
 export const filterOpe = (operations, typeVelib, startDate, endDate) => {
-  console.log("Filtering operations:", { typeVelib, startDate, endDate });
   let result = operations
 
   if (typeVelib === "ELECTRIC") result = result.filter(op => op.parameter1 === 'yes')
   else if (typeVelib === "MECHANICAL") result = result.filter(op => op.parameter1 === 'no')
 
-  if (startDate) result = result.filter(op => new Date(op.startDate) >= new Date(startDate))
-  if (endDate) result = result.filter(op => new Date(op.startDate) <= new Date(endDate))
+  if (startDate) result = result.filter(op => new Date(op.startDate.split("T")[0]) >= new Date(startDate))
+  if (endDate) result = result.filter(op => new Date(op.startDate.split("T")[0]) <= new Date(endDate))
 
   return result;
 }
