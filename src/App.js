@@ -80,6 +80,16 @@ function App() {
             →
             <input type="date" value={endDate || ""} onChange={(e) => setEndDate(e.target.value)} />
           </div>
+          {
+            (startDate || endDate) && (
+              <div className="buttons">
+                <button onClick={() => {
+                  setStartDate(null);
+                  setEndDate(null);
+                }}>Réinitialiser</button>
+              </div>
+            )
+          }
         </>
       }
       <Stats
@@ -87,6 +97,8 @@ function App() {
         typeVelib={typeVelib}
         startDate={startDate}
         endDate={endDate}
+        setStartDate={setStartDate}
+        setEndDate={setEndDate}
       />
     </div>
   );

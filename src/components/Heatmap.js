@@ -1,7 +1,7 @@
 import React from "react";
 import "../styles/Heatmap.css";
 
-const Heatmap = ({ data }) => {
+const Heatmap = ({ data, onClick = () => {} }) => {
   const [dates, setDates] = React.useState([]);
   const [maxValue, setMaxValue] = React.useState(1);
 
@@ -28,6 +28,7 @@ const Heatmap = ({ data }) => {
       {dates.map((day, wi) => (
         <div
           key={day.date}
+          onClick={() => onClick(day.date)}
           title={`${day.value} trajet(s) le ${new Date(day.date).toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`}
           className={`day-cell`}
           style={{

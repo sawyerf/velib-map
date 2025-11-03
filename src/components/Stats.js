@@ -7,7 +7,7 @@ import Heatmap from "../components/Heatmap";
 import Station from "../components/Station";
 import { BarChart } from '@mui/x-charts/BarChart';
 
-const Stats = ({ walletOperations, typeVelib, startDate, endDate }) => {
+const Stats = ({ walletOperations, typeVelib, startDate, endDate, setStartDate, setEndDate }) => {
   const [points, setPoints] = React.useState([]);
   const [stats, setStats] = React.useState(null);
   const [statsByDay, setStatsByDay] = React.useState(null);
@@ -60,7 +60,15 @@ const Stats = ({ walletOperations, typeVelib, startDate, endDate }) => {
       {statsByDay && (
         <>
           <h3 className="subtitle">Nombre de trajets par jour</h3>
-          <Heatmap data={statsByDay} />
+          <Heatmap data={statsByDay} onClick={(date) => {
+            if (date === startDate && date === endDate) {
+              setStartDate(null);
+              setEndDate(null);
+              return;
+            }
+            setStartDate(date);
+            setEndDate(date);
+          }} />
         </>
       )}
       {
