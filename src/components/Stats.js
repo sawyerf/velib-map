@@ -9,6 +9,7 @@ import { BarChart } from '@mui/x-charts/BarChart';
 
 const Stats = ({ walletOperations, typeVelib, startDate, endDate, setStartDate, setEndDate }) => {
   const [points, setPoints] = React.useState([]);
+  const [rides, setRides] = React.useState([]);
   const [stats, setStats] = React.useState(null);
   const [statsByDay, setStatsByDay] = React.useState(null);
   const [statsByHour, setStatsByHour] = React.useState([]);
@@ -21,6 +22,7 @@ const Stats = ({ walletOperations, typeVelib, startDate, endDate, setStartDate, 
     setStatsByDay(stat.getStatsByDay(walletOpsFiltered));
     setStatsByHour(stat.getStatsByHour(walletOpsFiltered));
     setTopStations(stat.getTopStations(walletOpsFiltered, 5));
+    setRides(stat.getRides(walletOpsFiltered));
   }, [walletOperations, typeVelib, startDate, endDate]);
 
   React.useEffect(() => {
@@ -30,7 +32,7 @@ const Stats = ({ walletOperations, typeVelib, startDate, endDate, setStartDate, 
   if (!walletOperations?.length) return null;
   return (
     <>
-      <Map points={points} />
+      <Map points={points} rides={rides} />
       {stats && (
         <div style={{ display: "grid", gap: "16px", marginTop: "20px", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", width: "100%", maxWidth: "800px" }}>
           <StatInfo name="Nombre de trajets" value={stats.totalRides} unit="" />

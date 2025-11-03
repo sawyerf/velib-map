@@ -72,6 +72,19 @@ export const processPoints2 = (walletOperations) => {
   return hitStations;
 }
 
+export const getRides = (walletOperations) => {
+  if (!walletOperations?.length) return [];
+  return walletOperations.map(op => {
+    const startStation = stationsById[op.parameter3.departureStationId];
+    const endStation = stationsById[op.parameter3.arrivalStationId];
+    if (!startStation || !endStation) return [];
+    return [
+      [startStation.lat, startStation.lon],
+      [endStation.lat, endStation.lon]
+    ];
+  });
+}
+
 export const getStat = (walletOperations) => {
   if (!walletOperations?.length) return {};
 
@@ -156,4 +169,5 @@ export default {
   getTopStations,
   getStatsByHour,
   processPoints2,
+  getRides,
 };

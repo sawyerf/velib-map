@@ -4,8 +4,9 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet.heat";
 
-function Map({ points }) {
+function Map({ points, rides }) {
   const map = React.useRef(null);
+  const [showRides, setShowRides] = React.useState(false);
 
   React.useEffect(() => {
     // 1️⃣ Initialiser la carte centrée sur Paris
@@ -42,6 +43,7 @@ function Map({ points }) {
     });
 
     const stations = L.layerGroup();
+    const ridesLayer = L.layerGroup();
 
     points.forEach(([lat, lon, intensity]) => {
       L.circleMarker([lat, lon], {
@@ -51,17 +53,37 @@ function Map({ points }) {
       }).addTo(stations);
     });
 
+    if (showRides) {
+      rides.forEach((ride) => {
+        console.log(ride);
+        L.polyline(ride, {
+          color: 'blue',
+          weight: 4,
+          opacity: 0.5
+        })
+          .addTo(ridesLayer);
+      });
+    }
+
     stations.addTo(map.current);
     heat.addTo(map.current);
+    ridesLayer.addTo(map.current);
 
     return () => {
       map.current.removeLayer(heat);
       map.current.removeLayer(stations);
+      map.current.removeLayer(ridesLayer);
     };
-  }, [points]);
+  }, [points, rides, showRides]);
 
   return (
-    <div style={{ height: "500px", width: "100%" }}>
+    <div style={{ height: "500px", width: "100%", position: "relative" }}>
+      <input
+        style={{ position: "absolute", bottom: "10px", left: "10px", zIndex: 1000 }}
+        type="checkbox"
+        checked={showRides}
+        onChange={(e) => setShowRides(e.target.checked)}
+      />
       <div
         id="map"
         style={{
