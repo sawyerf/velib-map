@@ -1,8 +1,8 @@
-<h1 align="center"><img width="20%" src="https://sawyerf.github.io/velib-map/icon.svg" /><br>Vélib map</h1>
+<h1 align="center"><a href="https://sawyerf.github.io/velib-map/"><img width="20%" src="https://sawyerf.github.io/velib-map/icon.svg" /></a><br>Vélib map</h1>
 
 <div align="center">
 Visualisez vos trajets et vos statistiques Vélib en un clin d'œil.<br><br>
-<img width="50%" alt="map" src="https://github.com/user-attachments/assets/01e7db7d-97cf-424b-8443-f61da89d1cca" />
+<a href="https://sawyerf.github.io/velib-map/"><img width="50%" alt="map" src="https://github.com/user-attachments/assets/01e7db7d-97cf-424b-8443-f61da89d1cca" /></a>
 
 *Aucune donnée n'est transmise à un serveur, toutes les données sont traitées localement dans votre navigateur.*
 </div>
