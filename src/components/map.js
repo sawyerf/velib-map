@@ -3,10 +3,13 @@ import React from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet.heat";
+import "../styles/map.css";
 
 function Map({ points, rides }) {
   const map = React.useRef(null);
   const [showRides, setShowRides] = React.useState(false);
+  const [showStations, setShowStations] = React.useState(true);
+  const [showHeatmap, setShowHeatmap] = React.useState(true);
 
   React.useEffect(() => {
     // 1️⃣ Initialiser la carte centrée sur Paris
@@ -27,6 +30,7 @@ function Map({ points, rides }) {
 
   React.useEffect(() => {
     if (!map.current) return;
+    if (!showHeatmap) return;
     if (points.length === 0) return;
 
     // 4️⃣ Ajouter la couche heatmap
@@ -34,6 +38,7 @@ function Map({ points, rides }) {
       radius: 20,      // Taille d’influence
       blur: 15,        // Lissage
       maxZoom: 17,     // Zoom max où la chaleur est visible
+      minOpacity: 0.1, // Opacité minimale
       gradient: {      // Couleurs
         0.1: "blue",
         0.3: "lime",
@@ -42,6 +47,16 @@ function Map({ points, rides }) {
       },
     });
 
+    heat.addTo(map.current);
+    return () => {
+      map.current.removeLayer(heat);
+    }
+  }, [points, showHeatmap]);
+
+  React.useEffect(() => {
+    if (!map.current) return;
+    if (!showStations) return;
+    if (points.length === 0) return;
     const stations = L.layerGroup();
 
     points.forEach(([lat, lon, intensity]) => {
@@ -53,13 +68,11 @@ function Map({ points, rides }) {
     });
 
     stations.addTo(map.current);
-    heat.addTo(map.current);
 
     return () => {
-      map.current.removeLayer(heat);
       map.current.removeLayer(stations);
     };
-  }, [points]);
+  }, [points, showStations]);
 
   React.useEffect(() => {
     if (!map.current) return;
@@ -69,11 +82,11 @@ function Map({ points, rides }) {
     const ridesLayer = L.layerGroup();
 
     rides.forEach((ride) => {
-      console.log(ride);
-      L.polyline(ride, {
-        color: 'blue',
+      if (ride.length < 3) return;
+      L.polyline([ride[0], ride[1]], {
+        color: ride[2] === 'electric' ? 'blue' : '#006800ff',
         weight: 4,
-        opacity: 0.3
+        opacity: 0.4
       })
         .addTo(ridesLayer);
     });
@@ -87,29 +100,33 @@ function Map({ points, rides }) {
 
   return (
     <div style={{ height: "500px", width: "100%", position: "relative" }}>
-      <div
-        style={{ position: "absolute", bottom: "10px", left: "10px", zIndex: 1000 }}
-        onClick={e => setShowRides(!showRides)}
-      >
-        <input
-          type="checkbox"
-          checked={showRides}
-          onChange={(e) => setShowRides(e.target.checked)}
-        />
-        <label
-          style={{ marginLeft: "8px", color: "black", fontWeight: "bold", textShadow: "1px 1px 2px white" }}
-        >Trajets</label>
+      <div className="map-options">
+        <div onClick={e => setShowHeatmap(!showHeatmap)}>
+          <input
+            type="checkbox"
+            checked={showHeatmap}
+            onChange={(e) => setShowHeatmap(e.target.checked)}
+          />
+          <label>Heatmap</label>
+        </div>
+        <div onClick={e => setShowStations(!showStations)}>
+          <input
+            type="checkbox"
+            checked={showStations}
+            onChange={(e) => setShowStations(e.target.checked)}
+          />
+          <label>Stations</label>
+        </div>
+        <div onClick={e => setShowRides(!showRides)}>
+          <input
+            type="checkbox"
+            checked={showRides}
+            onChange={(e) => setShowRides(e.target.checked)}
+          />
+          <label>Trajets</label>
+        </div>
       </div>
-      <div
-        id="map"
-        style={{
-          height: "100%",
-          width: "100%",
-          minHeight: "1px",
-          minWidth: "1px",
-          borderRadius: "12px",
-        }}
-      />
+      <div id="map" />
     </div>
   );
 }

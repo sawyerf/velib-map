@@ -90,6 +90,15 @@ button {
   border: 1px solid #ccc;
 }
 
+button.active {
+  background-color: gray;
+  color: white;
+}
+
+button:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
 #mechanical {
   color: green;
   background-color: #f0fff4;

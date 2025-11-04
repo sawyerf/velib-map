@@ -35,6 +35,32 @@ export const getHitStations = (walletOperations) => {
   return hitStations;
 }
 
+export const filterOpe = (operations, typeVelib, startDate, endDate, distanceFilter) => {
+  let result = operations
+
+  if (typeVelib === "ELECTRIC") result = result.filter(op => op.parameter1 === 'yes')
+  else if (typeVelib === "MECHANICAL") result = result.filter(op => op.parameter1 === 'no')
+
+  if (startDate) result = result.filter(op => new Date(op.startDate.split("T")[0]) >= new Date(startDate))
+  if (endDate) result = result.filter(op => new Date(op.startDate.split("T")[0]) <= new Date(endDate))
+  
+  switch (distanceFilter) {
+    case 1:
+      result = result.filter(op => parseInt(op.parameter3.DISTANCE, 10) < 2000);
+      break;
+    case 2:
+      result = result.filter(op => parseInt(op.parameter3.DISTANCE, 10) >= 2000 && parseInt(op.parameter3.DISTANCE, 10) < 5000);
+      break;
+    case 3:
+      result = result.filter(op => parseInt(op.parameter3.DISTANCE, 10) >= 5000 && parseInt(op.parameter3.DISTANCE, 10) < 10000);
+      break;
+    case 4:
+      result = result.filter(op => parseInt(op.parameter3.DISTANCE, 10) >= 10000);
+      break;
+  }
+  return result;
+}
+
 export const processPoints = (walletOperations) => {
   if (!walletOperations?.length) return [];
 
@@ -77,16 +103,29 @@ export const getRides = (walletOperations) => {
   return walletOperations.map(op => {
     const startStation = stationsById[op.parameter3.departureStationId];
     const endStation = stationsById[op.parameter3.arrivalStationId];
-    if (!startStation || !endStation) return [];
+    if (!startStation || !endStation) return null;
     return [
       [startStation.lat, startStation.lon],
-      [endStation.lat, endStation.lon]
+      [endStation.lat, endStation.lon],
+      op.parameter1 === 'yes' ? 'electric' : 'mechanical',
     ];
-  });
+  }).filter(Boolean);
 }
 
 export const getStat = (walletOperations) => {
-  if (!walletOperations?.length) return {};
+  if (!walletOperations?.length) return {
+    totalRides: 0,
+    maxDistance: 0,
+    maxSpeed: 0,
+    totalDistance: 0,
+    totalDuration: 0,
+    avgDuration: 0,
+    avgDistance: 0,
+    avgSpeed: 0,
+    amount: 0,
+    avgAmount: 0,
+    savedCo2: 0,
+  };
 
   return {
     totalRides: walletOperations.length,
@@ -131,18 +170,6 @@ export const getStatsByHour = (walletOperations) => {
     hour,
     ...(statsByHour[hour] || { count: 0, totalDistance: 0, totalDuration: 0 }),
   }));
-}
-
-export const filterOpe = (operations, typeVelib, startDate, endDate) => {
-  let result = operations
-
-  if (typeVelib === "ELECTRIC") result = result.filter(op => op.parameter1 === 'yes')
-  else if (typeVelib === "MECHANICAL") result = result.filter(op => op.parameter1 === 'no')
-
-  if (startDate) result = result.filter(op => new Date(op.startDate.split("T")[0]) >= new Date(startDate))
-  if (endDate) result = result.filter(op => new Date(op.startDate.split("T")[0]) <= new Date(endDate))
-
-  return result;
 }
 
 export const getTopStations = (walletOperations, topN = 5) => {

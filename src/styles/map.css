@@ -1,0 +1,32 @@
+#map {
+  height: 100%;
+  width: 100%;
+  min-height: 1px;
+  min-width: 1px;
+  border-radius: 12px;
+}
+
+.map-options {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  z-index: 1000;
+
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.map-options div {
+  cursor: pointer;
+}
+
+.map-options label {
+  margin-left: 8px;
+  color: black;
+  font-weight: bold;
+  font-size: 15px;
+}

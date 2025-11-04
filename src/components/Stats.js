@@ -7,7 +7,7 @@ import Heatmap from "../components/Heatmap";
 import Station from "../components/Station";
 import { BarChart } from '@mui/x-charts/BarChart';
 
-const Stats = ({ walletOperations, typeVelib, startDate, endDate, setStartDate, setEndDate }) => {
+const Stats = ({ walletOperations, typeVelib, startDate, endDate, setStartDate, setEndDate, distanceFilter }) => {
   const [points, setPoints] = React.useState([]);
   const [rides, setRides] = React.useState([]);
   const [stats, setStats] = React.useState(null);
@@ -16,18 +16,18 @@ const Stats = ({ walletOperations, typeVelib, startDate, endDate, setStartDate, 
   const [topStations, setTopStations] = React.useState([]);
 
   const updateStats = React.useCallback(() => {
-    const walletOpsFiltered = stat.filterOpe(walletOperations, typeVelib, startDate, endDate);
+    const walletOpsFiltered = stat.filterOpe(walletOperations, typeVelib, startDate, endDate, distanceFilter);
     setPoints(stat.processPoints(walletOpsFiltered));
     setStats(stat.getStat(walletOpsFiltered));
     setStatsByDay(stat.getStatsByDay(walletOpsFiltered));
     setStatsByHour(stat.getStatsByHour(walletOpsFiltered));
     setTopStations(stat.getTopStations(walletOpsFiltered, 5));
     setRides(stat.getRides(walletOpsFiltered));
-  }, [walletOperations, typeVelib, startDate, endDate]);
+  }, [walletOperations, typeVelib, startDate, endDate, distanceFilter]);
 
   React.useEffect(() => {
     updateStats();
-  }, [walletOperations, typeVelib, startDate, endDate]);
+  }, [walletOperations, typeVelib, startDate, endDate, distanceFilter]);
 
   if (!walletOperations?.length) return null;
   return (

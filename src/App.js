@@ -9,6 +9,7 @@ function App() {
   const [typeVelib, setTypeVelib] = React.useState("ALL");
   const [startDate, setStartDate] = React.useState(null);
   const [endDate, setEndDate] = React.useState(null);
+  const [distanceFilter, setDistanceFilter] = React.useState(null);
 
   document.body.ondrop = (event) => {
     handleFileChange(event);
@@ -44,6 +45,11 @@ function App() {
     reader.readAsText(file);
   }
 
+  const setDistFilter = (value) => {
+    if (distanceFilter === value) setDistanceFilter(null);
+    else setDistanceFilter(value);
+  }
+
   return (
     <div className="main-container">
       <h1>Statistiques Vélib</h1>
@@ -73,6 +79,12 @@ function App() {
             <button id="electric" onClick={() => setTypeVelib("ELECTRIC")} disabled={typeVelib === "ELECTRIC"}>Électrique</button>
           </div>
           <div className="buttons">
+            <button onClick={() => setDistFilter(1)} className={distanceFilter === 1 ? "active" : ""}>{"< 2 km"}</button>
+            <button onClick={() => setDistFilter(2)} className={distanceFilter === 2 ? "active" : ""}>{"2 - 5 km"}</button>
+            <button onClick={() => setDistFilter(3)} className={distanceFilter === 3 ? "active" : ""}>{"5 - 10 km"}</button>
+            <button onClick={() => setDistFilter(4)} className={distanceFilter === 4 ? "active" : ""}>{"> 10 km"}</button>
+          </div>
+          <div className="buttons">
             <input type="date" value={startDate || ""} onChange={(e) => setStartDate(e.target.value)} />
             →
             <input type="date" value={endDate || ""} onChange={(e) => setEndDate(e.target.value)} />
@@ -94,6 +106,7 @@ function App() {
         typeVelib={typeVelib}
         startDate={startDate}
         endDate={endDate}
+        distanceFilter={distanceFilter}
         setStartDate={setStartDate}
         setEndDate={setEndDate}
       />
