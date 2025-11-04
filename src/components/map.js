@@ -43,7 +43,6 @@ function Map({ points, rides }) {
     });
 
     const stations = L.layerGroup();
-    const ridesLayer = L.layerGroup();
 
     points.forEach(([lat, lon, intensity]) => {
       L.circleMarker([lat, lon], {
@@ -53,42 +52,61 @@ function Map({ points, rides }) {
       }).addTo(stations);
     });
 
-    if (showRides) {
-      rides.forEach((ride) => {
-        console.log(ride);
-        L.polyline(ride, {
-          color: 'blue',
-          weight: 4,
-          opacity: 0.5
-        })
-          .addTo(ridesLayer);
-      });
-    }
-
     stations.addTo(map.current);
     heat.addTo(map.current);
-    ridesLayer.addTo(map.current);
 
     return () => {
       map.current.removeLayer(heat);
       map.current.removeLayer(stations);
+    };
+  }, [points]);
+
+  React.useEffect(() => {
+    if (!map.current) return;
+    if (!showRides) return;
+    if (rides.length === 0) return;
+
+    const ridesLayer = L.layerGroup();
+
+    rides.forEach((ride) => {
+      console.log(ride);
+      L.polyline(ride, {
+        color: 'blue',
+        weight: 4,
+        opacity: 0.3
+      })
+        .addTo(ridesLayer);
+    });
+
+    ridesLayer.addTo(map.current);
+
+    return () => {
       map.current.removeLayer(ridesLayer);
     };
-  }, [points, rides, showRides]);
+  }, [rides, showRides]);
 
   return (
     <div style={{ height: "500px", width: "100%", position: "relative" }}>
-      <input
+      <div
         style={{ position: "absolute", bottom: "10px", left: "10px", zIndex: 1000 }}
-        type="checkbox"
-        checked={showRides}
-        onChange={(e) => setShowRides(e.target.checked)}
-      />
+        onClick={e => setShowRides(!showRides)}
+      >
+        <input
+          type="checkbox"
+          checked={showRides}
+          onChange={(e) => setShowRides(e.target.checked)}
+        />
+        <label
+          style={{ marginLeft: "8px", color: "black", fontWeight: "bold", textShadow: "1px 1px 2px white" }}
+        >Trajets</label>
+      </div>
       <div
         id="map"
         style={{
           height: "100%",
           width: "100%",
+          minHeight: "1px",
+          minWidth: "1px",
           borderRadius: "12px",
         }}
       />

@@ -74,11 +74,12 @@ a {
 }
 
 .buttons {
-  margin-bottom: 20px;
-  gap: 10px;
   display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   align-items: center;
   justify-content: center;
+  margin-bottom: 20px;
 }
 
 button {
@@ -142,4 +143,11 @@ button {
   flex-direction: column;
   gap: 0px;
   width: 100%;
+}
+
+#github {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1001;
 }

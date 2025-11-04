@@ -33,7 +33,10 @@ function App() {
     reader.onload = (e) => {
       try {
         const json = JSON.parse(e.target.result);
-        setWalletOperations(json.walletOperations.filter(op => op.parameter3.DISTANCE !== '0.0'));
+        setWalletOperations(
+          json.walletOperations.filter(op => op.parameter3.DISTANCE !== '0.0' &&
+            op.parameter3.departureStationId !== op.parameter3.arrivalStationId)
+        );
       } catch (error) {
         console.error("Invalid JSON file", error);
       }
@@ -44,6 +47,9 @@ function App() {
   return (
     <div className="main-container">
       <h1>Statistiques Vélib</h1>
+      <a id="github" href="https://github.com/sawyerf/velib-map" target="_blank" rel="noreferrer">
+        <img src="./github.svg" alt="GitHub" width="32" height="32" />
+      </a>
       {
         walletOperations.length === 0 && (
           <div className="tuto">
@@ -54,16 +60,7 @@ function App() {
           </div>
         )
       }
-      <div style={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "16px",
-        alignItems: "center",
-        justifyContent: "center",
-        marginBottom: "20px",
-        marginTop: "10px",
-      }}
-      >
+      <div className="buttons" style={{ marginTop: "10px" }}>
         <a className="download" href="https://www.velib-metropole.fr/api/private/getCourseList?limit=100000" target="_blank" rel="noreferrer">Télécharger vos trajets (JSON)</a>
         <input type="file" accept=".json" onChange={handleFileChange} />
       </div>
