@@ -32,8 +32,19 @@ function App() {
     }
     const reader = new FileReader();
     reader.onload = (e) => {
+      let data = e.target.result;
+
+      if (file.name.endsWith(".webarchive")) {
+        const match = data.match(/{"actionStatus":[\s\S]*?<\/pre>/);
+        if (match && match.length > 0) {
+          data = match[0].replace("</pre>", "");
+        } else {
+          console.error("Invalid webarchive file");
+          return;
+        }
+      }
       try {
-        const json = JSON.parse(e.target.result);
+        const json = JSON.parse(data);
         setWalletOperations(
           json.walletOperations.filter(op => op.parameter3.DISTANCE !== '0.0' &&
             op.parameter3.departureStationId !== op.parameter3.arrivalStationId)
@@ -52,6 +63,7 @@ function App() {
 
   return (
     <div className="main-container">
+      <img src="./icon.svg" alt="Vélib" width="100" />
       <h1>Statistiques Vélib</h1>
       <a id="github" href="https://github.com/sawyerf/velib-map" target="_blank" rel="noreferrer">
         <img src="./github.svg" alt="GitHub" width="32" height="32" />
@@ -68,7 +80,7 @@ function App() {
       }
       <div className="buttons" style={{ marginTop: "10px" }}>
         <a className="download" href="https://www.velib-metropole.fr/api/private/getCourseList?limit=100000" target="_blank" rel="noreferrer">Télécharger vos trajets (JSON)</a>
-        <input type="file" accept=".json" onChange={handleFileChange} />
+        <input type="file" accept=".json,.webarchive" onChange={handleFileChange} />
       </div>
       {
         walletOperations?.length > 0 &&

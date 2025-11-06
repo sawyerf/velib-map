@@ -14,6 +14,13 @@ const Stats = ({ walletOperations, typeVelib, startDate, endDate, setStartDate, 
   const [statsByDay, setStatsByDay] = React.useState(null);
   const [statsByHour, setStatsByHour] = React.useState([]);
   const [topStations, setTopStations] = React.useState([]);
+  const [width, setWidth] = React.useState(window.innerWidth);
+
+  React.useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const updateStats = React.useCallback(() => {
     const walletOpsFiltered = stat.filterOpe(walletOperations, typeVelib, startDate, endDate, distanceFilter);
@@ -82,8 +89,6 @@ const Stats = ({ walletOperations, typeVelib, startDate, endDate, setStartDate, 
               xAxis={[{ dataKey: 'hour', label: 'Heure de la journée' }]}
               series={[
                 { dataKey: 'count', label: 'Nombre de trajets', color: 'blue' },
-                // { dataKey: 'totalDistance', label: 'Distance totale (m)', color: 'green' },
-                // { dataKey: 'totalDuration', label: 'Durée totale (s)', color: 'orange' },
               ]}
               width={Math.min(window.innerWidth - 40, 800)}
               height={Math.min(window.innerWidth - 40, 800) * 0.5}
