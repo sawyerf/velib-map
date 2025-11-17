@@ -43,7 +43,7 @@ export const filterOpe = (operations, typeVelib, startDate, endDate, distanceFil
 
   if (startDate) result = result.filter(op => new Date(op.startDate.split("T")[0]) >= new Date(startDate))
   if (endDate) result = result.filter(op => new Date(op.startDate.split("T")[0]) <= new Date(endDate))
-  
+
   switch (distanceFilter) {
     case 1:
       result = result.filter(op => parseInt(op.parameter3.DISTANCE, 10) < 2000);
@@ -154,6 +154,42 @@ export const getStatsByDay = (walletOperations) => {
   return statsByDay;
 }
 
+const getWeekNumber = (date) => {
+  const year = date.getFullYear();
+  const firstDayOfYear = (new Date(year, 0, 1).getDay() || 7) - 1;
+  return Math.floor((((date - new Date(year, 0, 1)) / 86400000) + firstDayOfYear) / 7);
+}
+
+const keyWeek = (date) => {
+  const year = date.getFullYear();
+  const week = getWeekNumber(date);
+  return `${year}-W${week.toString().padStart(2, '0')}`;
+}
+
+export const getStatsByWeek = (walletOperations) => {
+  if (!walletOperations?.length) return {};
+  const statsByWeek = {};
+
+  for (let i = 0; i < 15; i++) {
+    const firstDayOfWeek = new Date();
+    firstDayOfWeek.setDate(firstDayOfWeek.getDate() - firstDayOfWeek.getDay() - (7 * i));
+    firstDayOfWeek.setHours(0, 0, 0, 0);
+    const weekKey = keyWeek(firstDayOfWeek);
+    statsByWeek[weekKey] = { date: firstDayOfWeek, distance: 0, duration: 0, rides: 0 };
+  }
+
+  for (const op of walletOperations) {
+    const date = new Date(op.startDate);
+    const weekKey = keyWeek(date);
+
+    if (!statsByWeek[weekKey]) continue;
+    statsByWeek[weekKey].rides += 1;
+    statsByWeek[weekKey].distance += parseInt(op.parameter3.DISTANCE, 10);
+    statsByWeek[weekKey].duration += parseDuration(op.quantityStr);
+  }
+  return statsByWeek;
+}
+
 export const getStatsByHour = (walletOperations) => {
   if (!walletOperations?.length) return [];
   const statsByHour = {};
@@ -192,6 +228,7 @@ export default {
   processPoints,
   getStat,
   getStatsByDay,
+  getStatsByWeek,
   filterOpe,
   getTopStations,
   getStatsByHour,

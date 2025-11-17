@@ -13,6 +13,7 @@ const Stats = ({ walletOperations, typeVelib, startDate, endDate, setStartDate, 
   const [stats, setStats] = React.useState(null);
   const [statsByDay, setStatsByDay] = React.useState(null);
   const [statsByHour, setStatsByHour] = React.useState([]);
+  const [statsByWeek, setStatsByWeek] = React.useState(null);
   const [topStations, setTopStations] = React.useState([]);
   const [width, setWidth] = React.useState(window.innerWidth);
 
@@ -30,6 +31,7 @@ const Stats = ({ walletOperations, typeVelib, startDate, endDate, setStartDate, 
     setStatsByHour(stat.getStatsByHour(walletOpsFiltered));
     setTopStations(stat.getTopStations(walletOpsFiltered, 5));
     setRides(stat.getRides(walletOpsFiltered));
+    setStatsByWeek(stat.getStatsByWeek(walletOpsFiltered));
   }, [walletOperations, typeVelib, startDate, endDate, distanceFilter]);
 
   React.useEffect(() => {
@@ -81,6 +83,26 @@ const Stats = ({ walletOperations, typeVelib, startDate, endDate, setStartDate, 
         </>
       )}
       {
+        statsByWeek && (
+          <>
+            <h3 className="subtitle">Distance par semaine</h3>
+            <BarChart
+              dataset={Object.entries(statsByWeek).sort(([weekA], [weekB]) => weekA.localeCompare(weekB)).map(([week, data]) => ({
+                date: data.date.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' }),
+                week: week,
+                distance: data.distance / 1000
+              }))}
+              xAxis={[{ dataKey: 'week', label: 'Semaine' }]}
+              series={[
+                { dataKey: 'distance', label: 'Distance (km)', color: 'orange' },
+              ]}
+              width={Math.min(width - 40, 800)}
+              height={Math.min(width - 40, 800) * 0.5}
+            />
+          </>
+        )
+      }
+      {
         statsByHour.length > 0 && (
           <>
             <h3 className="subtitle">Nombre de trajets par heure de la journée</h3>
@@ -90,8 +112,8 @@ const Stats = ({ walletOperations, typeVelib, startDate, endDate, setStartDate, 
               series={[
                 { dataKey: 'count', label: 'Nombre de trajets', color: 'blue' },
               ]}
-              width={Math.min(window.innerWidth - 40, 800)}
-              height={Math.min(window.innerWidth - 40, 800) * 0.5}
+              width={Math.min(width - 40, 800)}
+              height={Math.min(width - 40, 800) * 0.5}
             />
           </>
         )
